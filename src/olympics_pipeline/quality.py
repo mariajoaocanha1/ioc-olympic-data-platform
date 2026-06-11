@@ -3,13 +3,14 @@ quality.py
 ----------
 Data quality validation gates for the pipeline.
 
-Applied at the Bronze - Silver transition to ensure that only clean, well-formed records progress to the analytical layers.
-
-Invalid rows are dropped and logged as warnings so that data issues are visible without stopping the pipeline.
+Applied at the Bronze - Silver transition to ensure that only
+clean, well-formed records progress to the analytical layers.
+Invalid rows are dropped and logged as warnings so that data
+issues are visible without stopping the pipeline.
 
 Functions:
     validate_athlete_events: Validates the main events dataset
-    validate_noc_regions: Validates the NOC/country dataset
+    validate_noc_regions   : Validates the NOC/country dataset
 """
 
 import pandas as pd
@@ -33,6 +34,7 @@ def validate_athlete_events(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Validated DataFrame with invalid rows removed.
     """
+
     initial = len(df)
     df = df.dropna(subset=["ID", "Name", "NOC", "Year", "Season", "Sport", "Event"])
     df = df[df["Year"] > 1800]
@@ -57,6 +59,7 @@ def validate_noc_regions(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Validated DataFrame: One row per unique NOC code.
     """
+
     df = df.dropna(subset=["NOC"])
     df = df.drop_duplicates(subset=["NOC"])
     logger.info(f"NOC regions validated: {len(df):,} rows")

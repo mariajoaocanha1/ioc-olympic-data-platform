@@ -8,8 +8,10 @@ Covers the three core scenarios:
   2. Tracked attribute changes: Old record expired, new version inserted.
   3. New natural key: Record inserted as current.
 """
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
+
 from src.olympics_pipeline.scd import apply_scd2
 
 T0 = datetime(2000, 1, 1)

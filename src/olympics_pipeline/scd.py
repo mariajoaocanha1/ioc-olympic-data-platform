@@ -26,6 +26,7 @@ DIM_DATE:
 
 from datetime import datetime
 from typing import Optional
+
 import pandas as pd
 from loguru import logger
 

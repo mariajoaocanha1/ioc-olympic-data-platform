@@ -9,7 +9,7 @@ Orchestrates the three-layer pipeline:
   Gold    — dimensional model (star schema) ready for analytics.
 """
 from datetime import datetime
-from typing import Optional
+
 import pandas as pd
 from loguru import logger
 

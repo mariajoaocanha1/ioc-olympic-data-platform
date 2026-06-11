@@ -8,6 +8,7 @@ Covers the two main validation scenarios:
   2. Rows with invalid Sex values are dropped.
 """
 import pandas as pd
+
 from src.olympics_pipeline.quality import validate_athlete_events
 
 
@@ -52,7 +53,7 @@ def test_drops_invalid_sex_values() -> None:
 
 def test_valid_rows_are_preserved() -> None:
     """All valid rows pass through the quality check unchanged."""
-    
+
     df = pd.DataFrame([
         _make_valid_row(1, "Athlete One", "M"),
         _make_valid_row(2, "Athlete Two", "F"),

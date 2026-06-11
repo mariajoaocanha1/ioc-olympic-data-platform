@@ -9,14 +9,17 @@ Orchestrates the full Bronze -> Silver -> Gold medallion pipeline:
   2. Quality: Validates and filters invalid records
   3. Bronze: Persists raw data as Parquet (immutable audit trail)
   4. Silver: Cleanses and standardises data
-  5. Gold : Builds star schema dimensions (with SCD logic) and fact table, persisted as Parquet files
+  5. Gold: Builds star schema dimensions (with SCD logic)
+           and fact table, persisted as Parquet files
 
 Architecture note:
 
-  This implementation simulates a production lakehouse architecture locally using pandas and Parquet files,
-  maintaining the same Bronze, Silver, Gold logical separation that would apply at scale.
-  
-  The business logic is execution-engine agnostic, it can run unchanged on a distributed platform without modifications to
+  This implementation simulates a production lakehouse architecture
+  locally using pandas and Parquet files, maintaining the same
+  Bronze, Silver, Gold logical separation that would apply at scale.
+
+  The business logic is execution-engine agnostic, it can run
+  unchanged on a distributed platform without modifications to
   the transformation or SCD logic.
 
 Usage:
@@ -25,16 +28,16 @@ Usage:
 """
 
 from datetime import datetime
-import pandas as pd
+
 from loguru import logger
 
 from src.olympics_pipeline.config import (
-    RAW_DIR,
-    BRONZE_DIR,
-    SILVER_DIR,
-    GOLD_DIR,
     ATHLETE_EVENTS_FILE,
+    BRONZE_DIR,
+    GOLD_DIR,
     NOC_REGIONS_FILE,
+    RAW_DIR,
+    SILVER_DIR,
 )
 from src.olympics_pipeline.io import read_csv, read_parquet, write_parquet
 from src.olympics_pipeline.quality import (
@@ -43,12 +46,12 @@ from src.olympics_pipeline.quality import (
 )
 from src.olympics_pipeline.transformations import (
     build_bronze,
-    build_silver,
     build_dim_athlete,
+    build_dim_date,
     build_dim_event,
     build_dim_noc,
-    build_dim_date,
     build_fact_result,
+    build_silver,
 )
 
 
