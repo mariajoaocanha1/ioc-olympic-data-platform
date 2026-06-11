@@ -1,23 +1,31 @@
 # Olympic Data Platform (ioc-olympic-data-platform)
 
-A batch data pipeline built for the International Olympic Committee (IOC) analytics platform.
+A batch data pipeline built for the International Olympic Committee (IOC).
 
-Processes 120 years of Olympic history data through a medallion architecture (Bronze → Silver → Gold), producing a star schema ready for analytical queries.
+Processes 120 years of Olympic history data through a medallion architecture
+(Bronze → Silver → Gold), producing a star schema ready for analytical queries.
 
----
+## Assessment Deliverables
+
+| Deliverable | Description |
+|-------------|-------------|
+| [olympic_data_platform_assessment.pdf](./olympic_data_platform_assessment.pdf) | Architecture diagram, star schema, executive summary and SCD specification |
+| [src/olympics_pipeline/](./src/olympics_pipeline/) | Full pipeline implementation |
 
 ## Architecture
 
-The pipeline follows a medallion lakehouse architecture with three layers:
+The pipeline follows a medallion data lake architecture with three layers:
 
-- **Bronze** — raw CSV data ingested and persisted as Parquet, unchanged
-- **Silver** — cleansed, typed, and validated data
-- **Gold** — star schema dimensions and fact table, ready for analytics
+- **Bronze** — Raw CSV data ingested and persisted as Parquet, unchanged
+- **Silver** — Cleansed, typed, and validated data
+- **Gold** — Star schema dimensions and fact table, ready for analytics
 
-Implemented locally with pandas and Parquet, following the same logical separation that would apply in a production environment.
-The architecture is designed to be execution-engine agnostic, the business logic remains unchanged regardless of whether the pipeline runs locally or on a distributed platform.
+Implemented locally with pandas and Parquet, following the same logical
+separation that would apply in a production environment.
 
----
+The architecture is execution-engine agnostic — business logic remains
+unchanged regardless of whether the pipeline runs locally or on a 
+distributed platform.
 
 ## Star Schema
 
@@ -29,41 +37,38 @@ One fact table connected to four dimensions:
 | DIM_ATHLETE | Athlete profiles |
 | DIM_EVENT | Sport and event names |
 | DIM_NOC | Country/Region data |
-| DIM_DATE | Olympic edition |
-
----
+| DIM_DATE | Olympic edition | 
 
 ## SCD Types
 
 | Table | Column | SCD Type | Rationale |
 |-------|--------|----------|-----------|
-| DIM_ATHLETE | name | Type 1 | Overwrite: Name corrections |
-| DIM_ATHLETE | sex | Type 1 | Overwrite |
+| DIM_ATHLETE | name | Type 1 | Overwrite: Name corrections (Not historical events) |
+| DIM_ATHLETE | sex | Type 1 | Overwrite (No historical value) |
 | DIM_ATHLETE | height_cm | Type 2 | Physical changes matter for analysis |
 | DIM_ATHLETE | weight_kg | Type 2 | Weight changes affect performance analysis |
 | DIM_EVENT | sport | Type 2 | Sports reorganised across Olympic editions |
-| DIM_EVENT | event_name | Type 2 | Event names changed |
-| DIM_NOC | region | Type 2 | Countries renamed or unified |
-| DIM_NOC | notes | Type 1 | No historical value |
-| DIM_DATE | all | Type 0 | Immutable, Olympic date never changes |
-
----
+| DIM_EVENT | event_name | Type 2 | Event names changed over 120 years |
+| DIM_NOC | region | Type 2 | Countries renamed, unified or dissolved |
+| DIM_NOC | notes | Type 1 | Administrative (No historical value) |
+| DIM_DATE | all | Type 0 | Olympic date never changes |
 
 ## Project Structure
 
 ```
 src/olympics_pipeline/
-├── config.py           # paths and constants
-├── schemas.py          # typed dataclasses
-├── io.py               # read/write Parquet and CSV
-├── quality.py          # data validation
+├── config.py           # Paths and constants
+├── io.py               # Read/Write Parquet and CSV
+├── main.py             # Pipeline entrypoint
+├── quality.py          # Data validation
 ├── scd.py              # SCD Type 2 logic
-├── transformations.py  # Bronze to Silver to Gold
-└── main.py             # pipeline entrypoint
-```
+├── schemas.py          # Typed dataclasses
+└── transformations.py  # Bronze to Silver to Gold
 
----
-
+tests/
+├── test_quality.py     # Quality gate unit tests
+└── test_scd.py         # SCD Type 2 unit tests
+``` 
 
 ## Quick Start
 
@@ -89,9 +94,7 @@ make test
 
 # 6. Type check
 make typecheck
-```
-
----
+``` 
 
 ## Pipeline Output
 
@@ -101,9 +104,7 @@ make typecheck
 | dim_event | 765 |
 | dim_noc | 230 |
 | dim_date | 51 |
-| fact_result | 270,767 |
-
----
+| fact_result | 270,767 | 
 
 ## Tech Stack
 
@@ -114,6 +115,4 @@ make typecheck
 | pyarrow | Parquet read/write |
 | mypy (strict) | Static type checking |
 | pytest | Unit testing |
-| ruff | Linting |
-
----
+| ruff | Linting | 
