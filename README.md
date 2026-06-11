@@ -37,15 +37,15 @@ One fact table connected to four dimensions:
 
 | Table | Column | SCD Type | Rationale |
 |-------|--------|----------|-----------|
-| DIM_ATHLETE | name | Type 1 | Name corrections, not historical events |
-| DIM_ATHLETE | sex | Type 1 | Overwrite — no historical value |
+| DIM_ATHLETE | name | Type 1 | Overwrite: Name corrections |
+| DIM_ATHLETE | sex | Type 1 | Overwrite |
 | DIM_ATHLETE | height_cm | Type 2 | Physical changes matter for analysis |
 | DIM_ATHLETE | weight_kg | Type 2 | Weight changes affect performance analysis |
 | DIM_EVENT | sport | Type 2 | Sports reorganised across Olympic editions |
-| DIM_EVENT | event_name | Type 2 | Event names changed over 120 years |
-| DIM_NOC | region | Type 2 | Countries renamed, unified or dissolved |
-| DIM_NOC | notes | Type 1 | Administrative — no historical value |
-| DIM_DATE | all | Type 0 | Olympic year and season are immutable |
+| DIM_EVENT | event_name | Type 2 | Event names changed |
+| DIM_NOC | region | Type 2 | Countries renamed or unified |
+| DIM_NOC | notes | Type 1 | No historical value |
+| DIM_DATE | all | Type 0 | Immutable, Olympic date never changes |
 
 ---
 

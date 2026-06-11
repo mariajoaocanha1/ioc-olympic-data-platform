@@ -13,11 +13,11 @@ DIM_ATHLETE:
   weight_kg   SCD Type 2 (Weight changes matter for analysis)
 
 DIM_EVENT:
-  sport       SCD Type 2 (Sports reorganised across editions)
-  event_name  SCD Type 2 (Event names)
+  sport       SCD Type 2 (Sports reorganised across Olympic editions)
+  event_name  SCD Type 2 (Event names changed)
 
 DIM_NOC:
-  region      SCD Type 2 (For renamed OR unified)
+  region      SCD Type 2 (Countries renamed or unified)
   notes       SCD Type 1 (No historical value)
 
 DIM_DATE:
