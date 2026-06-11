@@ -13,6 +13,7 @@ from src.olympics_pipeline.quality import validate_athlete_events
 
 def _make_valid_row(athlete_id: int, name: str, sex: str) -> dict[str, object]:
     """Helper to build a valid athlete event row."""
+
     return {
         "ID": athlete_id,
         "Name": name,
@@ -27,6 +28,7 @@ def _make_valid_row(athlete_id: int, name: str, sex: str) -> dict[str, object]:
 
 def test_drops_rows_missing_required_fields() -> None:
     """Rows with null ID are removed by the quality check."""
+
     df = pd.DataFrame([
         _make_valid_row(1, "Valid Athlete", "M"),
         {**_make_valid_row(2, "Missing ID", "F"), "ID": None},
@@ -38,6 +40,7 @@ def test_drops_rows_missing_required_fields() -> None:
 
 def test_drops_invalid_sex_values() -> None:
     """Rows with Sex values other than M or F are removed."""
+
     df = pd.DataFrame([
         _make_valid_row(1, "Valid Athlete", "M"),
         _make_valid_row(2, "Invalid Sex", "X"),
@@ -49,6 +52,7 @@ def test_drops_invalid_sex_values() -> None:
 
 def test_valid_rows_are_preserved() -> None:
     """All valid rows pass through the quality check unchanged."""
+    
     df = pd.DataFrame([
         _make_valid_row(1, "Athlete One", "M"),
         _make_valid_row(2, "Athlete Two", "F"),

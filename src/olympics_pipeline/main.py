@@ -5,25 +5,25 @@ IOC Olympic Data Platform — Batch Pipeline entrypoint.
 
 Orchestrates the full Bronze -> Silver -> Gold medallion pipeline:
 
-  1. Extract  — reads raw CSV files from data/raw/
-  2. Quality  — validates and filters invalid records
-  3. Bronze   — persists raw data as Parquet (immutable audit trail)
-  4. Silver   — cleanses and standardises data
-  5. Gold     — builds star schema dimensions (with SCD logic)
-               and fact table, persisted as Parquet files
+  1. Extract: Reads raw CSV files from data/raw/
+  2. Quality: Validates and filters invalid records
+  3. Bronze: Persists raw data as Parquet (immutable audit trail)
+  4. Silver: Cleanses and standardises data
+  5. Gold : Builds star schema dimensions (with SCD logic) and fact table, persisted as Parquet files
 
 Architecture note:
-  This implementation simulates a production lakehouse architecture
-  locally using pandas and Parquet files. In a production environment
-  (e.g. IOC infrastructure), the same logical layers would run on
-  Apache Spark orchestrated by Apache Airflow, with MinIO as the
-  object store. The business logic remains identical — only the
-  execution engine changes.
+
+  This implementation simulates a production lakehouse architecture locally using pandas and Parquet files,
+  maintaining the same Bronze, Silver, Gold logical separation that would apply at scale.
+  
+  The business logic is execution-engine agnostic, it can run unchanged on a distributed platform without modifications to
+  the transformation or SCD logic.
 
 Usage:
     python -m src.olympics_pipeline.main
     make run
 """
+
 from datetime import datetime
 import pandas as pd
 from loguru import logger
@@ -66,25 +66,25 @@ def run(as_of: datetime | None = None) -> None:
     batch_time: datetime = as_of or datetime.utcnow()
     logger.info(f"Pipeline started — {batch_time.isoformat()}")
 
-    # ── 1. Extract ────────────────────────────────────────────────────────
+    # --- 1. Extract --------------------------------------------------------
     raw_events = read_csv(RAW_DIR / ATHLETE_EVENTS_FILE)
     raw_noc = read_csv(RAW_DIR / NOC_REGIONS_FILE)
 
-    # ── 2. Quality gates ──────────────────────────────────────────────────
+    # ---  2. Quality gates  ------------------------------------------------
     raw_events = validate_athlete_events(raw_events)
     raw_noc = validate_noc_regions(raw_noc)
 
-    # ── 3. Bronze ─────────────────────────────────────────────────────────
+    # --- 3. Bronze  --------------------------------------------------------
     bronze_events, bronze_noc = build_bronze(raw_events, raw_noc)
     write_parquet(bronze_events, BRONZE_DIR / "athlete_events.parquet")
     write_parquet(bronze_noc, BRONZE_DIR / "noc_regions.parquet")
 
-    # ── 4. Silver ─────────────────────────────────────────────────────────
+    # --- 4. Silver  --------------------------------------------------------
     silver_events, silver_noc = build_silver(bronze_events, bronze_noc)
     write_parquet(silver_events, SILVER_DIR / "athlete_events.parquet")
     write_parquet(silver_noc, SILVER_DIR / "noc_regions.parquet")
 
-    # ── 5. Gold — Dimensions (load existing state for SCD2 incremental) ───
+    # --- 5. Gold — Dimensions (load existing state for SCD2 incremental) ---
     existing_athlete = read_parquet(GOLD_DIR / "dim_athlete.parquet")
     existing_event = read_parquet(GOLD_DIR / "dim_event.parquet")
     existing_noc = read_parquet(GOLD_DIR / "dim_noc.parquet")
@@ -99,13 +99,13 @@ def run(as_of: datetime | None = None) -> None:
     write_parquet(dim_noc, GOLD_DIR / "dim_noc.parquet")
     write_parquet(dim_date, GOLD_DIR / "dim_date.parquet")
 
-    # ── 6. Gold — Fact table ──────────────────────────────────────────────
+    # ---  6. Gold — Fact table  -----------------------------------------------
     fact = build_fact_result(
         silver_events, dim_athlete, dim_event, dim_noc, dim_date
     )
     write_parquet(fact, GOLD_DIR / "fact_result.parquet")
 
-    # ── Summary ───────────────────────────────────────────────────────────
+    # ---  Summary  -------------------------------------------------------------
     logger.success("Pipeline completed successfully.")
     logger.info(f"  dim_athlete : {len(dim_athlete):,} rows")
     logger.info(f"  dim_event   : {len(dim_event):,} rows")

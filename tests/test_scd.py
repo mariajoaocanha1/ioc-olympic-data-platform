@@ -4,9 +4,9 @@ test_scd.py
 Unit tests for the SCD Type 2 implementation.
 
 Covers the three core scenarios:
-  1. No change detected — existing record unchanged.
-  2. Tracked attribute changes — old record expired, new version inserted.
-  3. New natural key — record inserted as current.
+  1. No change detected: Existing record unchanged.
+  2. Tracked attribute changes: Old record expired, new version inserted.
+  3. New natural key: Record inserted as current.
 """
 import pandas as pd
 from datetime import datetime

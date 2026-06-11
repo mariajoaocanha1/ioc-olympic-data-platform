@@ -1,29 +1,29 @@
 """
 Slowly Changing Dimension — Type 2 implementation.
 
-When a tracked attribute changes, the old record is expired
-(valid_to = now, is_current = False) and a new record is inserted
-(valid_from = now, valid_to = None, is_current = True).
+When a tracked attribute changes, the old record is expired (valid_to = now, is_current = False) and
+a new record is inserted (valid_from = now, valid_to = None, is_current = True).
 
 SCD types used per column:
 
 DIM_ATHLETE:
-  name       -> SCD Type 1 (overwrite — name corrections, not history)
-  sex        -> SCD Type 1 (overwrite)
-  height_cm  -> SCD Type 2 (physical changes matter for analysis)
-  weight_kg  -> SCD Type 2 (weight changes matter for analysis)
+  name        SCD Type 1 (Overwrite for name corrections)
+  sex         SCD Type 1 (Overwrite)
+  height_cm   SCD Type 2 (Physical changes matter for analysis)
+  weight_kg   SCD Type 2 (Weight changes matter for analysis)
 
 DIM_EVENT:
-  sport      -> SCD Type 2 (sports reorganised across editions)
-  event_name -> SCD Type 2 (event names changed over 120 years)
+  sport       SCD Type 2 (Sports reorganised across editions)
+  event_name  SCD Type 2 (Event names)
 
 DIM_NOC:
-  region     -> SCD Type 2 (countries renamed, split, unified)
-  notes      -> SCD Type 1 (administrative, no historical value)
+  region      SCD Type 2 (For renamed OR unified)
+  notes       SCD Type 1 (No historical value)
 
 DIM_DATE:
-  all cols   -> SCD Type 0 (immutable — Olympic year never changes)
+  all cols    SCD Type 0 (immutable, Olympic date never changes)
 """
+
 from datetime import datetime
 from typing import Optional
 import pandas as pd
