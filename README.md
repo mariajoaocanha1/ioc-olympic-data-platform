@@ -27,23 +27,52 @@ The architecture is execution-engine agnostic — business logic remains
 unchanged regardless of whether the pipeline runs locally or on a 
 distributed platform.
 
+## Repository Structure
+
+```
+ioc-olympic-data-platform/
+├── olympic_data_platform_assessment.pdf  # Assessment deliverable
+├── README.md
+├── Makefile                              # run, test, lint, typecheck
+├── requirements.txt
+├── pyproject.toml                        # 'mypy' and 'ruff' configuration
+├── docs/                                 # Architecture and schema diagrams
+├── src/
+│   └── olympics_pipeline/
+│       ├── config.py                     # Paths and constants
+│       ├── io.py                         # Read/Write Parquet and CSV
+│       ├── main.py                       # Pipeline entrypoint
+│       ├── quality.py                    # Data quality validation
+│       ├── scd.py                        # SCD Type 2 logic
+│       ├── schemas.py                    # Typed dataclasses
+│       └── transformations.py            # Bronze to Silver to Gold
+├── tests/
+│   ├── test_quality.py                   # Quality gate unit tests
+│   └── test_scd.py                       # SCD Type 2 unit tests
+└── data/                                 # Content not tracked (Generated at runtime)
+    ├── raw/                              # Place Kaggle CSVs here
+    ├── bronze/
+    ├── silver/
+    └── gold/
+``` 
+
 ## Star Schema
 
 One fact table connected to four dimensions:
 
 | Table | Description |
-|-----------|----------|
+|-------|-------------|
 | FACT_RESULT | One row per athlete per Olympic event |
-| DIM_ATHLETE | Athlete profiles |
-| DIM_EVENT | Sport and event names |
-| DIM_NOC | Country/Region data |
-| DIM_DATE | Olympic edition | 
+| DIM_ATHLETE | Athlete profiles (SCD Type 2) |
+| DIM_EVENT | Sport and event names (SCD Type 2) |
+| DIM_NOC | Country/Region data (SCD Type 2) |
+| DIM_DATE | Olympic edition (SCD Type 0) | 
 
 ## SCD Types
 
 | Table | Column | SCD Type | Rationale |
 |-------|--------|----------|-----------|
-| DIM_ATHLETE | name | Type 1 | Overwrite: Name corrections (Not historical events) |
+| DIM_ATHLETE | name | Type 1 | Overwrite, name corrections (Not historical events) |
 | DIM_ATHLETE | sex | Type 1 | Overwrite (No historical value) |
 | DIM_ATHLETE | height_cm | Type 2 | Physical changes matter for analysis |
 | DIM_ATHLETE | weight_kg | Type 2 | Weight changes affect performance analysis |
@@ -51,24 +80,7 @@ One fact table connected to four dimensions:
 | DIM_EVENT | event_name | Type 2 | Event names changed over 120 years |
 | DIM_NOC | region | Type 2 | Countries renamed, unified or dissolved |
 | DIM_NOC | notes | Type 1 | Administrative (No historical value) |
-| DIM_DATE | all | Type 0 | Olympic date never changes |
-
-## Project Structure
-
-```
-src/olympics_pipeline/
-├── config.py           # Paths and constants
-├── io.py               # Read/Write Parquet and CSV
-├── main.py             # Pipeline entrypoint
-├── quality.py          # Data validation
-├── scd.py              # SCD Type 2 logic
-├── schemas.py          # Typed dataclasses
-└── transformations.py  # Bronze to Silver to Gold
-
-tests/
-├── test_quality.py     # Quality gate unit tests
-└── test_scd.py         # SCD Type 2 unit tests
-``` 
+| DIM_DATE | all | Type 0 | Olympic dates are immutable | 
 
 ## Quick Start
 
@@ -86,14 +98,8 @@ pip install -r requirements.txt
 # Download from Kaggle and place both CSV files in data/raw/
 # https://www.kaggle.com/datasets/heesoo37/120-years-of-olympic-history-athletes-and-results
 
-# 4. Run pipeline
-make run
-
-# 5. Run tests
-make test
-
-# 6. Type check
-make typecheck
+# 4. Run everything
+make all
 ``` 
 
 ## Pipeline Output
